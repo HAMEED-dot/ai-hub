@@ -1,4 +1,9 @@
 import streamlit as st
+import google.generativeai as genai
+
+# --- Gemini Setup ---
+genai.configure(api_key="AIzaSyBUq1cGxapzhWncpdFa5SfKHcTTfemTtqw")  # Replace with your key
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 # --- Basic Page Setup ---
 st.set_page_config(page_title="Youth Wellness AI", page_icon="💬", layout="centered")
@@ -45,19 +50,18 @@ if user_input:
     # Store user message
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-    # Crisis check
     if crisis_check(user_input):
         ai_response = (
             "💜 I hear you and I’m really sorry you’re feeling this way. "
             "You deserve support right now. Please reach out to someone you trust or call your local helpline."
         )
     else:
-        # Simple supportive AI reply (placeholder)
-        ai_response = (
-            f"Thanks for sharing. It sounds like you’re going through something important. "
-            f"Remember: taking small steps like deep breathing or talking to a friend can help. "
-            f"You said: {user_input}"
+        # Use Gemini for AI-generated supportive response
+        response = model.generate_content(
+            f"You are a kind and supportive AI for youth mental wellness. "
+            f"Respond empathetically to this input: {user_input}"
         )
+        ai_response = response.text
 
     # Store AI message
     st.session_state.messages.append({"role": "assistant", "content": ai_response})
